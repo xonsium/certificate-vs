@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{% block admin_title %}Admin{% endblock %} · Certificate Verification{% endblock %}
+{% block body %}
+  <div class="min-h-screen flex flex-col bg-brand-bglight">
+    <header
+      class="border-b border-base-300/60 bg-base-100/90 backdrop-blur-sm sticky top-0 z-20"
+    >
+      <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-4">
+          <a href="{{ url_for('admin.dashboard') }}" class="font-semibold text-neutral"
+            >Admin</a
+          >
+          <nav class="flex gap-2 text-sm">
+            <a
+              href="{{ url_for('admin.dashboard') }}"
+              class="link link-hover text-brand-muted hover:text-primary transition-all duration-300"
+              >Dashboard</a
+            >
+            <a
+              href="{{ url_for('admin.certificate_new') }}"
+              class="link link-hover text-brand-muted hover:text-primary transition-all duration-300"
+              >New record</a
+            >
+            <a
+              href="{{ url_for('admin.settings') }}"
+              class="link link-hover text-brand-muted hover:text-primary transition-all duration-300"
+              >Settings</a
+            >
+          </nav>
+        </div>
+        <div class="flex items-center gap-3 text-sm">
+          {% if current_user.is_authenticated %}
+            <span class="text-brand-muted">{{ current_user.username }}</span>
+            <a href="{{ url_for('admin.logout') }}" class="btn btn-ghost btn-sm">Sign out</a>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="space-y-2 mb-6">
+            {% for category, message in messages %}
+              <div
+                role="alert"
+                class="alert {% if category == 'error' %}alert-error{% elif category == 'success' %}alert-success{% else %}alert-info{% endif %}"
+              >
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block admin_body %}{% endblock %}
+    </main>
+  </div>
+{% endblock %}

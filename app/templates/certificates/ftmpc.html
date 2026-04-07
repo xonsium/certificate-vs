@@ -1,0 +1,25 @@
+<section
+  class="cert-template active w-full h-full flex-col items-center justify-between p-14 border-[12px] border-brand-primary/25 bg-gradient-to-br from-base-100 to-base-200 text-neutral"
+  data-event-template="FTMPC"
+>
+  <div class="w-full text-center space-y-2">
+    <p class="text-xs uppercase tracking-[0.35em] text-brand-muted">Certificate of Achievement</p>
+    <h3 class="text-4xl font-semibold text-brand-primary tracking-tight">FTMPC</h3>
+    <p class="text-lg text-brand-muted font-medium">Future Tech & Media Programming Challenge</p>
+  </div>
+  <div class="text-center space-y-6 max-w-2xl">
+    <p class="text-sm text-brand-muted">This certifies that</p>
+    <p class="text-4xl font-semibold leading-tight" data-cert-field="name"></p>
+    <p class="text-xl text-brand-muted" data-cert-field="institution"></p>
+    <div class="divider text-brand-muted text-xs">Details</div>
+    <div class="grid grid-cols-1 gap-2 text-base">
+      <p><span class="text-brand-muted">Segment:</span> <span data-cert-field="segment"></span></p>
+      <p><span class="text-brand-muted">Prize place:</span> <span data-cert-field="prize_place"></span></p>
+      <p><span class="text-brand-muted">Installment:</span> <span data-cert-field="installment"></span></p>
+    </div>
+  </div>
+  <div class="w-full flex justify-between items-end text-xs text-brand-muted">
+    <span data-cert-field="code_label"></span>
+    <span>Certificate Verification System</span>
+  </div>
+</section>

@@ -1,0 +1,157 @@
+{% extends "admin/base.html" %}
+{% block admin_title %}Dashboard{% endblock %}
+{% block admin_body %}
+  <div class="space-y-8 step-enter">
+    <div>
+      <h1 class="text-2xl font-semibold text-neutral mb-2">Dashboard</h1>
+      <p class="text-brand-muted text-sm">Certificate records and quick stats.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="stat bg-base-100 shadow-sm border border-base-300/80 rounded-box px-4 py-3">
+        <div class="stat-title text-brand-muted text-xs uppercase tracking-wide">Total</div>
+        <div class="stat-value text-2xl text-neutral">{{ stats.total }}</div>
+      </div>
+      {% for ev in events %}
+        <div class="stat bg-base-100 shadow-sm border border-base-300/80 rounded-box px-4 py-3">
+          <div class="stat-title text-brand-muted text-xs">{{ ev }}</div>
+          <div class="stat-value text-2xl text-neutral">{{ stats.by_event.get(ev, 0) }}</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <form
+      method="get"
+      action="{{ url_for('admin.dashboard') }}"
+      class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end"
+    >
+      <input type="hidden" name="sort" value="{{ sort }}" />
+      <input type="hidden" name="order" value="{{ order }}" />
+      <label class="form-control flex-1">
+        <span class="label-text">Search name, institution, or code</span>
+        <input
+          type="search"
+          name="q"
+          value="{{ q }}"
+          class="input input-bordered input-sm w-full max-w-md"
+          placeholder="Search…"
+        />
+      </label>
+      <button type="submit" class="btn btn-primary btn-sm">Search</button>
+    </form>
+
+    <div class="overflow-x-auto rounded-box border border-base-300/80 bg-base-100 shadow-sm">
+      <table class="table table-sm table-zebra">
+        <thead>
+          <tr class="text-brand-muted">
+            <th>
+              {% if sort == 'created_at' %}
+                {% set noc = 'asc' if order == 'desc' else 'desc' %}
+              {% else %}
+                {% set noc = 'desc' %}
+              {% endif %}
+              <a
+                class="link link-hover"
+                href="{{ url_for('admin.dashboard', page=1, q=q, sort='created_at', order=noc) }}"
+                >Created</a
+              >
+            </th>
+            <th>
+              {% if sort == 'event' %}
+                {% set noe = 'asc' if order == 'desc' else 'desc' %}
+              {% else %}
+                {% set noe = 'asc' %}
+              {% endif %}
+              <a
+                class="link link-hover"
+                href="{{ url_for('admin.dashboard', page=1, q=q, sort='event', order=noe) }}"
+                >Event</a
+              >
+            </th>
+            <th>
+              {% if sort == 'verification_code' %}
+                {% set nov = 'asc' if order == 'desc' else 'desc' %}
+              {% else %}
+                {% set nov = 'asc' %}
+              {% endif %}
+              <a
+                class="link link-hover"
+                href="{{ url_for('admin.dashboard', page=1, q=q, sort='verification_code', order=nov) }}"
+                >Code</a
+              >
+            </th>
+            <th>
+              {% if sort == 'name' %}
+                {% set non = 'asc' if order == 'desc' else 'desc' %}
+              {% else %}
+                {% set non = 'asc' %}
+              {% endif %}
+              <a
+                class="link link-hover"
+                href="{{ url_for('admin.dashboard', page=1, q=q, sort='name', order=non) }}"
+                >Name</a
+              >
+            </th>
+            <th>Institution</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td class="whitespace-nowrap text-xs text-brand-muted">
+                {{ row.created_at.strftime('%Y-%m-%d %H:%M') if row.created_at else '—' }}
+              </td>
+              <td class="font-medium">{{ row.event }}</td>
+              <td class="font-mono text-xs">{{ row.verification_code }}</td>
+              <td>{{ row.name }}</td>
+              <td class="max-w-[12rem] truncate" title="{{ row.institution }}">
+                {{ row.institution }}
+              </td>
+              <td class="text-right whitespace-nowrap">
+                <a
+                  href="{{ url_for('admin.certificate_edit', oid=row._id) }}"
+                  class="btn btn-ghost btn-xs"
+                  >Edit</a
+                >
+                <form
+                  method="post"
+                  action="{{ url_for('admin.certificate_delete', oid=row._id) }}"
+                  class="inline"
+                  onsubmit="return confirm('Delete this record?');"
+                >
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                  <button type="submit" class="btn btn-ghost btn-xs text-error">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" class="text-center text-brand-muted py-8">No records yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if pages > 1 %}
+      <div class="join flex justify-center">
+        {% if page > 1 %}
+          <a
+            class="join-item btn btn-sm"
+            href="{{ url_for('admin.dashboard', page=page-1, q=q, sort=sort, order=order) }}"
+            >«</a
+          >
+        {% endif %}
+        <button class="join-item btn btn-sm btn-disabled no-animation">Page {{ page }} / {{ pages }}</button>
+        {% if page < pages %}
+          <a
+            class="join-item btn btn-sm"
+            href="{{ url_for('admin.dashboard', page=page+1, q=q, sort=sort, order=order) }}"
+            >»</a
+          >
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

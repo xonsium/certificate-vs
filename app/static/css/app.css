@@ -1,0 +1,100 @@
+:root {
+  --color-primary: #20268c;
+  --color-background-dark: #171826;
+  --color-surface-dark: #363740;
+  --color-text-muted: #9798a6;
+  --color-background-light: #f2efeb;
+}
+
+.step-enter {
+  animation: step-enter 0.45s ease-out both;
+}
+
+@keyframes step-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.certificate-offscreen {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1123px;
+  height: 794px;
+  overflow: hidden;
+}
+
+#certificate-root {
+  background: #f2efeb;
+}
+
+.cert-template {
+  display: none;
+}
+
+.cert-template.active {
+  display: flex;
+}
+
+#certificate-root .cert-template {
+  background-image: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%) !important;
+  border-color: rgba(32, 38, 140, 0.25) !important;
+  color: #111827 !important;
+}
+
+#certificate-root .cert-template[data-event-template="INIT"] {
+  background-image: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+#certificate-root .cert-template[data-event-template="Thynk"] {
+  background-image: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+#certificate-root .cert-template[data-event-template="PixelCon"] {
+  background-image: linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%) !important;
+  border-color: rgba(236, 72, 153, 0.25) !important;
+}
+
+#certificate-root .text-brand-muted {
+  color: #6b7280 !important;
+}
+
+#certificate-root .text-neutral {
+  color: #111827 !important;
+}
+
+#certificate-root .text-brand-primary {
+  color: #20268c !important;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  #certificate-root {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .cert-template {
+    display: none !important;
+  }
+
+  .cert-template.print-active {
+    display: flex !important;
+  }
+}

@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+{% block admin_title %}{% if edit %}Edit record{% else %}New record{% endif %}{% endblock %}
+{% block admin_body %}
+  <div class="max-w-2xl step-enter">
+    <h1 class="text-2xl font-semibold text-neutral mb-6">
+      {% if edit %}Edit certificate record{% else %}Add certificate record{% endif %}
+    </h1>
+    <form method="post" class="card bg-base-100 border border-base-300/80 shadow-sm">
+      <div class="card-body gap-4">
+        {{ form.hidden_tag() }}
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.event.label }}</span>
+          {{ form.event(class_="select select-bordered w-full") }}
+          {% for e in form.event.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.verification_code.label }}</span>
+          {{ form.verification_code(class_="input input-bordered w-full font-mono uppercase") }}
+          {% for e in form.verification_code.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.name.label }}</span>
+          {{ form.name(class_="input input-bordered w-full") }}
+          {% for e in form.name.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.institution.label }}</span>
+          {{ form.institution(class_="input input-bordered w-full") }}
+          {% for e in form.institution.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.segment.label }}</span>
+          {{ form.segment(class_="input input-bordered w-full") }}
+          {% for e in form.segment.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.prize_place.label }}</span>
+          {{ form.prize_place(class_="input input-bordered w-full") }}
+          {% for e in form.prize_place.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.installment.label }}</span>
+          {{ form.installment(class_="input input-bordered w-full") }}
+          {% for e in form.installment.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <div class="card-actions justify-end">
+          <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Cancel</a>
+          {{ form.submit(class_="btn btn-primary") }}
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

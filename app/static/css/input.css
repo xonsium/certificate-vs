@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #20268c;
+  --color-background-dark: #171826;
+  --color-surface-dark: #363740;
+  --color-text-muted: #9798a6;
+  --color-background-light: #f2efeb;
+}
+
+@layer utilities {
+  .step-enter {
+    animation: step-enter 0.45s ease-out both;
+  }
+
+  @keyframes step-enter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+.certificate-offscreen {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1123px;
+  height: 794px;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  #certificate-root {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+}

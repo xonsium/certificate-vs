@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Verify your certificate{% endblock %}
+{% block body %}
+  <div class="min-h-screen flex flex-col no-print">
+    <header
+      class="border-b border-base-300/60 bg-base-100/80 backdrop-blur-sm sticky top-0 z-20"
+    >
+      <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center relative">
+        <a href="/" class="text-lg font-semibold tracking-tight text-neutral">
+          NDITC Certificate Verification
+        </a>
+        <a
+          href="{{ url_for('admin.login') }}"
+          class="text-sm text-brand-muted hover:text-primary transition-all duration-300 absolute right-4"
+          >Admin</a
+        >
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-10">
+      <div class="mb-10 step-enter text-center">
+        <h1 class="text-3xl font-semibold text-neutral mb-2">Verify participation</h1>
+        <p class="text-brand-muted max-w-xl mx-auto">
+          Select your event, enter your six-character code, then download your certificate.
+        </p>
+      </div>
+
+      <!-- Step 1 -->
+      <section
+        id="step-1"
+        class="card bg-base-100 shadow-sm border border-base-300/80 step-enter"
+        data-step="1"
+      >
+        <div class="card-body gap-4">
+          <h2 class="card-title text-lg">1. Choose event</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {% for ev in events %}
+              <button
+                type="button"
+                class="btn btn-outline border-base-300 hover:text-primary hover:border-primary hover:bg-primary/5 justify-start h-auto min-h-[3.25rem] transition-all duration-300"
+                data-event="{{ ev }}"
+              >
+                <span class="font-medium">{{ ev }}</span>
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2 -->
+      <section
+        id="step-2"
+        class="card bg-base-100 shadow-sm border border-base-300/80 mt-6 hidden step-enter"
+        data-step="2"
+      >
+        <div class="card-body gap-4">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="card-title text-lg">2. Enter code</h2>
+            <span
+              id="selected-event-label"
+              class="badge badge-primary badge-outline font-mono text-xs"
+            ></span>
+          </div>
+          <p class="text-sm text-brand-muted">
+            Six alphanumeric characters (letters and numbers), as printed on your materials.
+          </p>
+          <div class="flex flex-col gap-3">
+            <input
+              type="text"
+              id="code-input"
+              maxlength="6"
+              autocomplete="off"
+              autocapitalize="characters"
+              class="input input-bordered w-full font-mono tracking-[0.35em] uppercase"
+              placeholder="••••••"
+            />
+            <button type="button" id="verify-btn" class="btn btn-primary w-full">
+              <span id="verify-label">Verify</span>
+              <span id="verify-spinner" class="loading loading-spinner loading-sm hidden"></span>
+            </button>
+          </div>
+          <p id="verify-error" class="text-sm text-error hidden"></p>
+        </div>
+      </section>
+
+      <!-- Step 3 -->
+      <section
+        id="step-3"
+        class="card bg-base-100 shadow-sm border border-base-300/80 mt-6 hidden step-enter"
+        data-step="3"
+      >
+        <div class="card-body gap-4">
+          <h2 class="card-title text-lg text-success">Verified</h2>
+          <div class="grid gap-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-base-300/70 pb-2">
+              <span class="text-brand-muted">Full name</span>
+              <span id="res-name" class="font-medium text-right"></span>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-base-300/70 pb-2">
+              <span class="text-brand-muted">Institution</span>
+              <span id="res-institution" class="font-medium text-right"></span>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-base-300/70 pb-2">
+              <span class="text-brand-muted">Segment</span>
+              <span id="res-segment" class="font-medium text-right"></span>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-base-300/70 pb-2">
+              <span class="text-brand-muted">Prize place</span>
+              <span id="res-prize" class="font-medium text-right"></span>
+            </div>
+            <div class="flex justify-between gap-4 pb-1">
+              <span class="text-brand-muted">Installment</span>
+              <span id="res-installment" class="font-medium text-right"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 4 -->
+      <section
+        id="step-4"
+        class="card bg-base-100 shadow-sm border border-base-300/80 mt-6 hidden step-enter"
+        data-step="4"
+      >
+        <div class="card-body gap-4">
+          <h2 class="card-title text-lg">4. Certificate</h2>
+          <p class="text-sm text-brand-muted">
+            Download a PDF copy. You can also use your browser’s print dialog for a physical copy.
+          </p>
+          <div class="flex flex-wrap gap-3 justify-center">
+            <button type="button" id="download-pdf-btn" class="btn btn-primary">
+              Download PDF
+            </button>
+            <button type="button" id="print-btn" class="btn btn-outline border-base-300">
+              Print
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-base-300/60 py-6 text-center text-xs text-brand-muted">
+      Certificate verification for FTMPC, INIT, Thynk, and PixelCon. © 2026 NDITC.
+    </footer>
+  </div>
+
+  <!-- Off-screen certificate for capture / print -->
+  <div id="certificate-root" class="certificate-offscreen bg-brand-bglight" aria-hidden="true">
+    {% include "certificates/ftmpc.html" %}
+    {% include "certificates/init.html" %}
+    {% include "certificates/thynk.html" %}
+    {% include "certificates/pixelcon.html" %}
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.0/jspdf.umd.min.js"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <script src="{{ url_for('static', filename='js/verify.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+{% block admin_title %}Settings{% endblock %}
+{% block admin_body %}
+  <div class="max-w-2xl step-enter space-y-6">
+    <div class="max-w-md">
+    <h1 class="text-2xl font-semibold text-neutral mb-2">Settings</h1>
+    <p class="text-brand-muted text-sm mb-6">Change your admin password.</p>
+    <form method="post" class="card bg-base-100 border border-base-300/80 shadow-sm">
+      <div class="card-body gap-4">
+        {{ form.hidden_tag() }}
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.current_password.label }}</span>
+          {{ form.current_password(class_="input input-bordered w-full") }}
+          {% for e in form.current_password.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.new_password.label }}</span>
+          {{ form.new_password(class_="input input-bordered w-full") }}
+          {% for e in form.new_password.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <label class="form-control w-full">
+          <span class="label-text">{{ form.confirm_password.label }}</span>
+          {{ form.confirm_password(class_="input input-bordered w-full") }}
+          {% for e in form.confirm_password.errors %}
+            <span class="text-error text-sm">{{ e }}</span>
+          {% endfor %}
+        </label>
+        <div class="card-actions justify-end">
+          {{ form.submit(class_="btn btn-primary") }}
+        </div>
+      </div>
+    </form>
+    </div>
+
+    <div class="max-w-xl">
+      <h2 class="text-xl font-semibold text-neutral mb-2">API access token</h2>
+      <p class="text-brand-muted text-sm mb-4">
+        Generate a token to create certificate records from external scripts. Keep it secret.
+      </p>
+      <form method="post" class="card bg-base-100 border border-base-300/80 shadow-sm">
+        <div class="card-body gap-4">
+          {{ token_form.hidden_tag() }}
+          <p class="text-sm text-brand-muted">
+            Generating a new token replaces the previous one immediately.
+          </p>
+          <div class="card-actions justify-start">
+            {{ token_form.generate_token(class_="btn btn-primary") }}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
