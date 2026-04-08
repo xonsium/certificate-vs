@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Verify your certificate{% endblock %}
 {% block body %}
-  <div class="min-h-screen flex flex-col no-print">
-    <header
+  <div class="min-h-screen flex flex-col no-print page-dark">
+    <!-- <header
       class="border-b border-base-300/60 bg-base-100/80 backdrop-blur-sm sticky top-0 z-20"
     >
       <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center relative">
@@ -15,20 +15,24 @@
           >Admin</a
         >
       </div>
-    </header>
+    </header> -->
 
     <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-10">
-      <div class="mb-10 step-enter text-center">
-        <h1 class="text-3xl font-semibold text-neutral mb-2">Verify participation</h1>
-        <p class="text-brand-muted max-w-xl mx-auto">
-          Select your event, enter your six-character code, then download your certificate.
+      <div class="mb-10 step-enter text-center relative overflow-hidden">
+        <div class="absolute inset-x-0 -top-16 h-72 opacity-40 blur-3xl bg-gradient-to-r from-brand-primary/40 via-white/10 to-sky-400/20 pointer-events-none"></div>
+        <span class="step-label">NDITC Certificate Cerification</span>
+        <h1 class="text-4xl sm:text-5xl font-semibold text-white mb-3">
+          Secure, instant certificate validation
+        </h1>
+        <p class="text-brand-muted max-w-2xl mx-auto">
+          Choose your event, enter the verification code, and download a polished certificate PDF in seconds.
         </p>
       </div>
 
       <!-- Step 1 -->
       <section
         id="step-1"
-        class="card bg-base-100 shadow-sm border border-base-300/80 step-enter"
+        class="card page-card shadow-sm border step-enter"
         data-step="1"
       >
         <div class="card-body gap-4">
@@ -37,7 +41,7 @@
             {% for ev in events %}
               <button
                 type="button"
-                class="btn btn-outline border-base-300 hover:text-primary hover:border-primary hover:bg-primary/5 justify-start h-auto min-h-[3.25rem] transition-all duration-300"
+                class="btn btn-outline justify-start h-auto min-h-[3.25rem] transition-all duration-300 border-slate-600/50 bg-slate-950/40 hover:bg-slate-900/70 hover:border-brand-primary/50 hover:text-white"
                 data-event="{{ ev }}"
               >
                 <span class="font-medium">{{ ev }}</span>
@@ -50,7 +54,7 @@
       <!-- Step 2 -->
       <section
         id="step-2"
-        class="card bg-base-100 shadow-sm border border-base-300/80 mt-6 hidden step-enter"
+        class="card page-card shadow-sm border mt-6 hidden step-enter"
         data-step="2"
       >
         <div class="card-body gap-4">
@@ -71,7 +75,7 @@
               maxlength="6"
               autocomplete="off"
               autocapitalize="characters"
-              class="input input-bordered w-full font-mono tracking-[0.35em] uppercase"
+              class="input input-bordered text-center w-full font-mono tracking-[0.35em] uppercase bg-slate-950/40 border-slate-600/50"
               placeholder="••••••"
             />
             <button type="button" id="verify-btn" class="btn btn-primary w-full">
@@ -86,7 +90,7 @@
       <!-- Step 3 -->
       <section
         id="step-3"
-        class="card bg-base-100 shadow-sm border border-base-300/80 mt-6 hidden step-enter"
+        class="card page-card shadow-sm border mt-6 hidden step-enter"
         data-step="3"
       >
         <div class="card-body gap-4">
@@ -119,7 +123,7 @@
       <!-- Step 4 -->
       <section
         id="step-4"
-        class="card bg-base-100 shadow-sm border border-base-300/80 mt-6 hidden step-enter"
+        class="card page-card shadow-sm border mt-6 hidden step-enter"
         data-step="4"
       >
         <div class="card-body gap-4">
@@ -128,7 +132,7 @@
             Download a PDF copy. You can also use your browser’s print dialog for a physical copy.
           </p>
           <div class="flex flex-wrap gap-3 justify-center">
-            <button type="button" id="download-pdf-btn" class="btn btn-primary">
+            <button type="button" id="download-pdf-btn" class="btn btn-primary w-full sm:w-auto">
               Download PDF
             </button>
             <button type="button" id="print-btn" class="btn btn-outline border-base-300">

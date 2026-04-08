@@ -1,9 +1,98 @@
 :root {
-  --color-primary: #20268c;
-  --color-background-dark: #171826;
-  --color-surface-dark: #363740;
-  --color-text-muted: #9798a6;
-  --color-background-light: #f2efeb;
+  --color-primary: #7f8dff;
+  --color-background-dark: #070b16;
+  --color-surface-dark: #101825;
+  --color-text-muted: #9aadc8;
+  --color-background-light: #0c1223;
+  --color-surface-light: #111a2b;
+  --color-accent: #84c7ff;
+  --color-muted-strong: #64748b;
+}
+
+.page-dark {
+  background: radial-gradient(circle at 15% 10%, rgba(124, 148, 255, 0.24), transparent 19%),
+    radial-gradient(circle at 85% 18%, rgba(255, 255, 255, 0.08), transparent 18%),
+    linear-gradient(180deg, #06090f 0%, #0f1626 100%);
+  color: #ebf1ff;
+}
+
+.page-dark .text-neutral {
+  color: #ebf1ff !important;
+}
+
+.page-dark .text-brand-muted {
+  color: #9bb1d5 !important;
+}
+
+.page-dark .page-card {
+  background: rgba(14, 21, 40, 0.92);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 36px 100px rgba(0, 0, 0, 0.28);
+}
+
+.page-dark .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+.page-dark .btn-primary {
+  background-image: linear-gradient(135deg, #7f8dff, #84c7ff);
+  color: #07101f;
+  border: none;
+  box-shadow: 0 16px 38px rgba(124, 148, 255, 0.22);
+}
+
+.page-dark .btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+.page-dark .btn-outline {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(124, 148, 255, 0.24);
+  color: #dce6ff;
+}
+
+.page-dark .badge-primary {
+  background: rgba(124, 148, 255, 0.14);
+  border-color: rgba(124, 148, 255, 0.3);
+  color: #dbe7ff;
+}
+
+.page-dark .input.input-bordered {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #eef2ff;
+}
+
+.page-dark .input.input-bordered::placeholder {
+  color: #95aacd;
+}
+
+.page-dark .step-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  background: rgba(124, 148, 255, 0.12);
+  color: #dbe9ff;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+}
+
+.page-dark .section-accent {
+  position: absolute;
+  top: -1.5rem;
+  right: -1rem;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(124, 148, 255, 0.24), transparent 65%);
+  pointer-events: none;
+}
+
+.page-dark footer {
+  color: #8ea6c7;
 }
 
 .step-enter {

@@ -60,6 +60,27 @@
     });
   }
 
+  function copyComputedStyles(source, target) {
+    const computed = window.getComputedStyle(source);
+    [
+      "color",
+      "backgroundColor",
+      "backgroundImage",
+      "borderColor",
+      "borderTopColor",
+      "borderRightColor",
+      "borderBottomColor",
+      "borderLeftColor",
+      "boxShadow",
+      "textShadow",
+      "filter",
+    ].forEach((prop) => {
+      if (computed[prop]) {
+        target.style[prop] = computed[prop];
+      }
+    });
+  }
+
   document.querySelectorAll("[data-event]").forEach((btn) => {
     btn.addEventListener("click", () => {
       selectedEvent = btn.dataset.event || null;
@@ -119,6 +140,7 @@
       fillTemplate(lastPayload);
       show(step3);
       show(step4);
+      step3.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch {
       verifyError.textContent = "Network error. Please try again.";
       verifyError.classList.remove("hidden");
@@ -144,10 +166,25 @@
     }
 
     try {
+      
       const canvas = await html2canvas(captureEl, {
         scale: 2,
         useCORS: true,
         backgroundColor: "#ffffff",
+        onclone: (clonedDoc) => {
+          const cloneRoot = clonedDoc.querySelector(
+            `[data-event-template="${lastPayload.event}"]`
+          );
+          if (!cloneRoot) return;
+          copyComputedStyles(captureEl, cloneRoot);
+          const originals = Array.from(captureEl.querySelectorAll("*"));
+          const clones = Array.from(cloneRoot.querySelectorAll("*"));
+          originals.forEach((orig, index) => {
+            const clone = clones[index];
+            if (!clone) return;
+            copyComputedStyles(orig, clone);
+          });
+        },
       });
       const img = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
