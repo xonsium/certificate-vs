@@ -76,7 +76,15 @@
       "filter",
     ].forEach((prop) => {
       if (computed[prop]) {
-        target.style[prop] = computed[prop];
+        let value = computed[prop];
+        // Convert oklch to rgb if needed
+        if (value.includes("oklch")) {
+          const rgbMatch = window.getComputedStyle(source, null).getPropertyValue(prop);
+          if (rgbMatch && rgbMatch.includes("rgb")) {
+            value = rgbMatch;
+          }
+        }
+        target.style[prop] = value;
       }
     });
   }
@@ -150,7 +158,18 @@
   }
 
   function getActiveTemplate() {
-    return activeTemplate || eventTemplates.find((x) => x.classList.contains("active"));
+    // First check if activeTemplate is still valid and has the active class
+    if (activeTemplate && activeTemplate.classList.contains("active")) {
+      return activeTemplate;
+    }
+    // Otherwise find the active template by class
+    const found = eventTemplates.find((x) => x.classList.contains("active"));
+    if (found) {
+      activeTemplate = found;
+      return found;
+    }
+    // Fallback to activeTemplate if it exists
+    return activeTemplate;
   }
 
   async function downloadPdf() {
@@ -166,11 +185,12 @@
     }
 
     try {
-      
       const canvas = await html2canvas(captureEl, {
         scale: 2,
         useCORS: true,
         backgroundColor: "#ffffff",
+        windowWidth: captureEl.scrollWidth,
+        windowHeight: captureEl.scrollHeight,
         onclone: (clonedDoc) => {
           const cloneRoot = clonedDoc.querySelector(
             `[data-event-template="${lastPayload.event}"]`
