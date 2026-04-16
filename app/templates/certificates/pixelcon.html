@@ -9,17 +9,17 @@
   </div>
   <div class="text-center space-y-6 max-w-2xl">
     <p class="text-sm text-brand-muted">This certifies that</p>
-    <p class="text-4xl font-semibold leading-tight" data-cert-field="name"></p>
-    <p class="text-xl text-brand-muted" data-cert-field="institution"></p>
+    <p class="text-4xl font-semibold leading-tight">{{ name }}</p>
+    <p class="text-xl text-brand-muted">{{ institution }}</p>
     <div class="divider text-brand-muted text-xs">Details</div>
     <div class="grid grid-cols-1 gap-2 text-base">
-      <p><span class="text-brand-muted">Segment:</span> <span data-cert-field="segment"></span></p>
-      <p><span class="text-brand-muted">Prize place:</span> <span data-cert-field="prize_place"></span></p>
-      <p><span class="text-brand-muted">Installment:</span> <span data-cert-field="installment"></span></p>
+      <p><span class="text-brand-muted">Segment:</span> <span>{{ segment }}</span></p>
+      <p><span class="text-brand-muted">Prize place:</span> <span>{{ prize_place }}</span></p>
+      <p><span class="text-brand-muted">Installment:</span> <span>{{ installment }}</span></p>
     </div>
   </div>
   <div class="w-full flex justify-between items-end text-xs text-brand-muted">
-    <span data-cert-field="code_label"></span>
+    <span>Code: {{ code }}</span>
     <span>Certificate Verification System</span>
   </div>
 </section>

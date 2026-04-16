@@ -147,25 +147,7 @@
       Certificate verification for FTMPC, INIT, Thynk, and PixelCon. © 2026 NDITC.
     </footer>
   </div>
-
-  <!-- Off-screen certificate for capture / print -->
-  <div id="certificate-root" class="certificate-offscreen bg-brand-bglight" aria-hidden="true">
-    {% include "certificates/ftmpc.html" %}
-    {% include "certificates/init.html" %}
-    {% include "certificates/thynk.html" %}
-    {% include "certificates/pixelcon.html" %}
-  </div>
 {% endblock %}
 {% block scripts %}
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  ></script>
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.0/jspdf.umd.min.js"
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  ></script>
   <script src="{{ url_for('static', filename='js/verify.js') }}"></script>
 {% endblock %}

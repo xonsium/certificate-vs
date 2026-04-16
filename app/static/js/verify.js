@@ -1,6 +1,5 @@
 (function () {
   const csrf = document.querySelector('meta[name="csrf-token"]')?.content || "";
-  const eventTemplates = Array.from(document.querySelectorAll("[data-event-template]"));
 
   const step2 = document.getElementById("step-2");
   const step3 = document.getElementById("step-3");
@@ -15,7 +14,6 @@
 
   let selectedEvent = null;
   let lastPayload = null;
-  let activeTemplate = eventTemplates.find((x) => x.classList.contains("active")) || null;
 
   function show(el) {
     el.classList.remove("hidden");
@@ -33,67 +31,10 @@
     verifySpinner.classList.toggle("hidden", !loading);
   }
 
-  function setActiveTemplate(eventName) {
-    activeTemplate = null;
-    eventTemplates.forEach((tpl) => {
-      const isActive = tpl.dataset.eventTemplate === eventName;
-      tpl.classList.toggle("active", isActive);
-      tpl.classList.toggle("print-active", isActive);
-      if (isActive) activeTemplate = tpl;
-    });
-  }
-
-  function fillTemplate(p) {
-    if (!activeTemplate) return;
-    const fields = {
-      name: p.name,
-      institution: p.institution,
-      segment: p.segment,
-      prize_place: p.prize_place,
-      installment: p.installment,
-      code_label: "Code: " + p.code,
-    };
-    Object.entries(fields).forEach(([key, value]) => {
-      activeTemplate.querySelectorAll(`[data-cert-field="${key}"]`).forEach((el) => {
-        el.textContent = value || "";
-      });
-    });
-  }
-
-  function copyComputedStyles(source, target) {
-    const computed = window.getComputedStyle(source);
-    [
-      "color",
-      "backgroundColor",
-      "backgroundImage",
-      "borderColor",
-      "borderTopColor",
-      "borderRightColor",
-      "borderBottomColor",
-      "borderLeftColor",
-      "boxShadow",
-      "textShadow",
-      "filter",
-    ].forEach((prop) => {
-      if (computed[prop]) {
-        let value = computed[prop];
-        // Convert oklch to rgb if needed
-        if (value.includes("oklch")) {
-          const rgbMatch = window.getComputedStyle(source, null).getPropertyValue(prop);
-          if (rgbMatch && rgbMatch.includes("rgb")) {
-            value = rgbMatch;
-          }
-        }
-        target.style[prop] = value;
-      }
-    });
-  }
-
   document.querySelectorAll("[data-event]").forEach((btn) => {
     btn.addEventListener("click", () => {
       selectedEvent = btn.dataset.event || null;
       selectedLabel.textContent = selectedEvent || "";
-      setActiveTemplate(selectedEvent);
       codeInput.value = "";
       verifyError.classList.add("hidden");
       hide(step3);
@@ -145,7 +86,6 @@
       document.getElementById("res-prize").textContent = c.prize_place;
       document.getElementById("res-installment").textContent = c.installment;
 
-      fillTemplate(lastPayload);
       show(step3);
       show(step4);
       step3.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -173,10 +113,7 @@
   }
 
   async function downloadPdf() {
-    const captureEl = getActiveTemplate();
-    if (!captureEl || !lastPayload || typeof html2canvas === "undefined") return;
-    const { jsPDF } = window.jspdf || {};
-    if (!jsPDF) return;
+    if (!lastPayload) return;
 
     const originalText = downloadPdfBtn?.textContent || "";
     if (downloadPdfBtn) {
@@ -185,41 +122,45 @@
     }
 
     try {
-      const canvas = await html2canvas(captureEl, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        windowWidth: captureEl.scrollWidth,
-        windowHeight: captureEl.scrollHeight,
-        onclone: (clonedDoc) => {
-          const cloneRoot = clonedDoc.querySelector(
-            `[data-event-template="${lastPayload.event}"]`
-          );
-          if (!cloneRoot) return;
-          copyComputedStyles(captureEl, cloneRoot);
-          const originals = Array.from(captureEl.querySelectorAll("*"));
-          const clones = Array.from(cloneRoot.querySelectorAll("*"));
-          originals.forEach((orig, index) => {
-            const clone = clones[index];
-            if (!clone) return;
-            copyComputedStyles(orig, clone);
-          });
+      const res = await fetch("/api/download-certificate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrf,
         },
+        body: JSON.stringify({
+          event: lastPayload.event,
+          code: lastPayload.code,
+        }),
       });
-      const img = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "landscape",
-        unit: "px",
-        format: [canvas.width, canvas.height],
-      });
-      pdf.addImage(img, "PNG", 0, 0, canvas.width, canvas.height);
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        verifyError.textContent =
+          data.error === "not_found"
+            ? "Certificate not found. Please verify again."
+            : "Unable to generate PDF. Please try again.";
+        verifyError.classList.remove("hidden");
+        return;
+      }
+
+      // Get the PDF blob and trigger download
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
       const safeName =
-        (lastPayload.name || "certificate").replace(/[^\w\s-]/g, "").trim().slice(0, 40) ||
+        (lastPayload.name || "certificate").replace(/[^\w\s-]/g, "").trim().toLowerCase().slice(0, 40) ||
         "certificate";
-      pdf.save(`${safeName}-${lastPayload.event}-certificate.pdf`);
+      a.download = `${safeName}-${lastPayload.event.toLowerCase()}-certificate.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      verifyError.classList.add("hidden");
     } catch (err) {
       console.error(err);
-      verifyError.textContent = "Unable to generate PDF. Please try again.";
+      verifyError.textContent = "Network error. Please try again.";
       verifyError.classList.remove("hidden");
     } finally {
       if (downloadPdfBtn) {

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate - {{ event }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <style>
+        @page {
+            size: landscape;
+            margin: 0;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+        .cert-template {
+            page-break-after: avoid;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 56px;
+        }
+    </style>
+</head>
+<body>
+    {% include certificate_template %}
+</body>
+</html>
