@@ -1,10 +1,7 @@
 import re
-from io import BytesIO
-
-from flask import Blueprint, jsonify, request, render_template, send_file
+from flask import Blueprint, jsonify, request, render_template
 from flask_wtf.csrf import CSRFError, validate_csrf
 from sqlalchemy.exc import IntegrityError
-from weasyprint import HTML, CSS
 
 from app.config import Config
 from app import models as m
@@ -132,7 +129,7 @@ def certificates_create():
 
 @bp.route("/download-certificate", methods=["POST"])
 def download_certificate():
-    """Generate and download a certificate as PDF using WeasyPrint."""
+    """Generate and return certificate HTML for PDF generation via html2canvas."""
     token = request.headers.get("X-CSRFToken") or request.headers.get("X-CSRF-Token")
     try:
         validate_csrf(token)
@@ -155,14 +152,28 @@ def download_certificate():
     if not doc:
         return jsonify({"ok": False, "error": "not_found"}), 404
 
-    # Map event name to template file
+    # Map event + installment to template file
     template_path_map = {
+        ("FTMPC", "1"): "certificates/ftmpc_1.html",
+        ("FTMPC", "2"): "certificates/ftmpc_2.html",
+        ("INIT", "1"): "certificates/init_1.html",
+        ("INIT", "2"): "certificates/init_2.html",
+        ("Thynk", "1"): "certificates/thynk_1.html",
+        ("Thynk", "2"): "certificates/thynk_2.html",
+        ("PixelCon", "1"): "certificates/pixelcon_1.html",
+        ("PixelCon", "2"): "certificates/pixelcon_2.html",
+    }
+    # Fallback to event-based template if installment-specific not found
+    fallback_map = {
         "FTMPC": "certificates/ftmpc.html",
         "INIT": "certificates/init.html",
         "Thynk": "certificates/thynk.html",
         "PixelCon": "certificates/pixelcon.html",
     }
-    template_path = template_path_map.get(event)
+    installment = doc.get("installment", "1")
+    template_path = template_path_map.get((event, installment))
+    if not template_path:
+        template_path = fallback_map.get(event)
     if not template_path:
         return jsonify({"ok": False, "error": "invalid_event"}), 400
 
@@ -180,20 +191,10 @@ def download_certificate():
             code=doc["verification_code"],
         )
 
-        # Generate PDF using WeasyPrint
-        pdf_bytes = HTML(string=html_string).write_pdf()
-
-        # Create filename safely
-        safe_name = (
-            re.sub(r"[^\w\s-]", "", doc["name"] or "certificate").strip().lower().replace(" ", "-")[:40]
-            or "certificate"
-        )
-
-        return send_file(
-            BytesIO(pdf_bytes),
-            mimetype="application/pdf",
-            as_attachment=True,
-            download_name=f"{safe_name}-{event.lower()}-certificate.pdf",
-        )
+        return jsonify({
+            "ok": True,
+            "html": html_string,
+            "filename": f"{event}_{doc['installment']}_{code}",
+        })
     except Exception as e:
-        return jsonify({"ok": False, "error": "pdf_generation_failed", "message": str(e)}), 500
+        return jsonify({"ok": False, "error": "html_generation_failed", "message": str(e)}), 500

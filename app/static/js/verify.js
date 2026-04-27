@@ -97,21 +97,6 @@
     }
   }
 
-  function getActiveTemplate() {
-    // First check if activeTemplate is still valid and has the active class
-    if (activeTemplate && activeTemplate.classList.contains("active")) {
-      return activeTemplate;
-    }
-    // Otherwise find the active template by class
-    const found = eventTemplates.find((x) => x.classList.contains("active"));
-    if (found) {
-      activeTemplate = found;
-      return found;
-    }
-    // Fallback to activeTemplate if it exists
-    return activeTemplate;
-  }
-
   async function downloadPdf() {
     if (!lastPayload) return;
 
@@ -134,8 +119,8 @@
         }),
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
         verifyError.textContent =
           data.error === "not_found"
             ? "Certificate not found. Please verify again."
@@ -144,23 +129,63 @@
         return;
       }
 
-      // Get the PDF blob and trigger download
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      const safeName =
-        (lastPayload.name || "certificate").replace(/[^\w\s-]/g, "").trim().toLowerCase().slice(0, 40) ||
-        "certificate";
-      a.download = `${safeName}-${lastPayload.event.toLowerCase()}-certificate.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      // Create a temporary container to render the HTML
+      const container = document.createElement("div");
+      container.innerHTML = data.html;
+      container.style.position = "absolute";
+      container.style.left = "-9999px";
+      container.style.top = "0";
+      container.style.width = "1200px";
+      container.style.height = "850px";
+      container.style.background = "white";
+      document.body.appendChild(container);
+
+      // Use html2canvas to capture the certificate
+      if (typeof html2canvas === "undefined") {
+        // Load html2canvas dynamically
+        const script = document.createElement("script");
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+        document.head.appendChild(script);
+        await new Promise((resolve) => {
+          script.onload = resolve;
+          script.onerror = resolve;
+        });
+      }
+
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+      });
+
+      // Convert canvas to PDF using jsPDF
+      if (typeof jspdf === "undefined") {
+        const pdfScript = document.createElement("script");
+        pdfScript.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+        document.head.appendChild(pdfScript);
+        await new Promise((resolve) => {
+          pdfScript.onload = resolve;
+          pdfScript.onerror = resolve;
+        });
+      }
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "px",
+        format: [canvas.width / 2, canvas.height / 2],
+      });
+
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
+      pdf.save(`${data.filename}.pdf`);
+
+      // Clean up
+      document.body.removeChild(container);
       verifyError.classList.add("hidden");
     } catch (err) {
       console.error(err);
-      verifyError.textContent = "Network error. Please try again.";
+      verifyError.textContent = "Unable to generate PDF. Please try again.";
       verifyError.classList.remove("hidden");
     } finally {
       if (downloadPdfBtn) {

@@ -2,64 +2,64 @@
 {% block admin_title %}{% if edit %}Edit record{% else %}New record{% endif %}{% endblock %}
 {% block admin_body %}
   <div class="max-w-2xl step-enter">
-    <h1 class="text-2xl font-semibold text-neutral mb-6">
+    <h1 class="text-2xl font-semibold text-gray-800 mb-6">
       {% if edit %}Edit certificate record{% else %}Add certificate record{% endif %}
     </h1>
-    <form method="post" class="card bg-base-100 border border-base-300/80 shadow-sm">
-      <div class="card-body gap-4">
+    <form method="post" class="bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div class="p-6 flex flex-col gap-4">
         {{ form.hidden_tag() }}
-        <label class="form-control w-full">
-          <span class="label-text">{{ form.event.label }}</span>
-          {{ form.event(class_="select select-bordered w-full") }}
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.event.label }}</label>
+          {{ form.event(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
           {% for e in form.event.errors %}
-            <span class="text-error text-sm">{{ e }}</span>
+            <span class="text-red-500 text-sm">{{ e }}</span>
           {% endfor %}
-        </label>
-        <label class="form-control w-full">
-          <span class="label-text">{{ form.verification_code.label }}</span>
-          {{ form.verification_code(class_="input input-bordered w-full font-mono uppercase") }}
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.verification_code.label }}</label>
+          {{ form.verification_code(class="w-full px-3 py-2 border border-gray-300 rounded-md font-mono uppercase focus:outline-none focus:ring-2 focus:ring-blue-500") }}
           {% for e in form.verification_code.errors %}
-            <span class="text-error text-sm">{{ e }}</span>
+            <span class="text-red-500 text-sm">{{ e }}</span>
           {% endfor %}
-        </label>
-        <label class="form-control w-full">
-          <span class="label-text">{{ form.name.label }}</span>
-          {{ form.name(class_="input input-bordered w-full") }}
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.name.label }}</label>
+          {{ form.name(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
           {% for e in form.name.errors %}
-            <span class="text-error text-sm">{{ e }}</span>
+            <span class="text-red-500 text-sm">{{ e }}</span>
           {% endfor %}
-        </label>
-        <label class="form-control w-full">
-          <span class="label-text">{{ form.institution.label }}</span>
-          {{ form.institution(class_="input input-bordered w-full") }}
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.institution.label }}</label>
+          {{ form.institution(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
           {% for e in form.institution.errors %}
-            <span class="text-error text-sm">{{ e }}</span>
+            <span class="text-red-500 text-sm">{{ e }}</span>
           {% endfor %}
-        </label>
-        <label class="form-control w-full">
-          <span class="label-text">{{ form.segment.label }}</span>
-          {{ form.segment(class_="input input-bordered w-full") }}
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.segment.label }}</label>
+          {{ form.segment(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
           {% for e in form.segment.errors %}
-            <span class="text-error text-sm">{{ e }}</span>
+            <span class="text-red-500 text-sm">{{ e }}</span>
           {% endfor %}
-        </label>
-        <label class="form-control w-full">
-          <span class="label-text">{{ form.prize_place.label }}</span>
-          {{ form.prize_place(class_="input input-bordered w-full") }}
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.prize_place.label }}</label>
+          {{ form.prize_place(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
           {% for e in form.prize_place.errors %}
-            <span class="text-error text-sm">{{ e }}</span>
+            <span class="text-red-500 text-sm">{{ e }}</span>
           {% endfor %}
-        </label>
-        <label class="form-control w-full">
-          <span class="label-text">{{ form.installment.label }}</span>
-          {{ form.installment(class_="input input-bordered w-full") }}
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.installment.label }}</label>
+          {{ form.installment(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
           {% for e in form.installment.errors %}
-            <span class="text-error text-sm">{{ e }}</span>
+            <span class="text-red-500 text-sm">{{ e }}</span>
           {% endfor %}
-        </label>
-        <div class="card-actions justify-end">
-          <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Cancel</a>
-          {{ form.submit(class_="btn btn-primary") }}
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <a href="{{ url_for('admin.dashboard') }}" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors">Cancel</a>
+          {{ form.submit(class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors") }}
         </div>
       </div>
     </form>

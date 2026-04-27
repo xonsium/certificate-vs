@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -32,14 +32,10 @@
         },
       };
     </script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
     {% block head_extra %}{% endblock %}
   </head>
-  <body class="min-h-screen bg-brand-bglight text-neutral font-sans antialiased">
+  <body class="min-h-screen bg-gray-50 text-gray-800 font-sans antialiased">
     {% block body %}{% endblock %}
     {% block scripts %}{% endblock %}
   </body>
