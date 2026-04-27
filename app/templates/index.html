@@ -2,20 +2,21 @@
 {% block title %}Verify your certificate{% endblock %}
 {% block body %}
   <div class="min-h-screen flex flex-col no-print page-dark">
-    <!-- <header
+    <header
       class="border-b border-base-300/60 bg-base-100/80 backdrop-blur-sm sticky top-0 z-20"
     >
-      <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center relative">
+      <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-start relative">
         <a href="/" class="text-lg font-semibold tracking-tight text-neutral">
-          NDITC Certificate Verification
+          <img src="https://nditc.net/Logo.png" alt="NDITC Logo" class="h-8 inline-block mr-2" />
         </a>
         <a
-          href="{{ url_for('admin.login') }}"
-          class="text-sm text-brand-muted hover:text-primary transition-all duration-300 absolute right-4"
-          >Admin</a
+          href="https://xonsium.github.io/"
+          target="_blank"
+          class="text-sm hover:text-primary transition-all duration-300 absolute right-4"
+          >Developer</a
         >
       </div>
-    </header> -->
+    </header>
 
     <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-10">
       <div class="mb-10 step-enter text-center relative overflow-hidden">
@@ -133,10 +134,7 @@
           </p>
           <div class="flex flex-wrap gap-3 justify-center">
             <button type="button" id="download-pdf-btn" class="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium w-full sm:w-auto">
-              Download PDF
-            </button>
-            <button type="button" id="print-btn" class="px-4 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-              Print
+              Download Certificate
             </button>
           </div>
         </div>

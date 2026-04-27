@@ -200,5 +200,4 @@
     if (e.key === "Enter") verify();
   });
   document.getElementById("download-pdf-btn")?.addEventListener("click", downloadPdf);
-  document.getElementById("print-btn")?.addEventListener("click", () => window.print());
 })();
