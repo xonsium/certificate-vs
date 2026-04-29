@@ -60,24 +60,60 @@
       >
         <div class="p-6 flex flex-col gap-4">
           <div class="flex items-center justify-between gap-2">
-            <h2 class="text-lg font-semibold">2. Enter code</h2>
+            <h2 class="text-lg font-semibold">2. Choose certificate type</h2>
             <span
               id="selected-event-label"
               class="px-2 py-1 text-xs font-mono rounded-full border border-blue-500 text-blue-600 bg-blue-50"
             ></span>
           </div>
           <p class="text-sm text-brand-muted">
-            Six alphanumeric characters (letters and numbers), as printed on your materials.
+            Select whether you have a Winner certificate or a Participation certificate.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              type="button"
+              class="flex justify-center items-center h-auto min-h-[3.25rem] px-4 py-3 border border-gray-400/50 bg-black/80 text-white hover:bg-blue-600 hover:border-blue-500/50 hover:text-white rounded-md transition-all duration-300 text-left"
+              data-cert-type="winner"
+            >
+              <span class="font-medium">Winner</span>
+            </button>
+            <button
+              type="button"
+              class="flex justify-center items-center h-auto min-h-[3.25rem] px-4 py-3 border border-gray-400/50 bg-blue-600 text-white hover:bg-black/80 hover:border-gray-400/50 hover:text-white rounded-md transition-all duration-300 text-left"
+              data-cert-type="participation"
+            >
+              <span class="font-medium">Participation</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2b: Verification Code (only for Winner or FTMPC Participation) -->
+      <section
+        id="step-2b"
+        class="card page-card shadow-sm border mt-6 hidden step-enter"
+        data-step="2b"
+      >
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="text-lg font-semibold">3. Enter code</h2>
+            <span
+              id="selected-type-label"
+              class="px-2 py-1 text-xs font-mono rounded-full border border-blue-500 text-blue-600 bg-blue-50"
+            ></span>
+          </div>
+          <p class="text-sm text-brand-muted">
+            Sixty-four alphanumeric characters (letters and numbers), as printed on your materials.
           </p>
           <div class="flex flex-col gap-3">
             <input
               type="text"
               id="code-input"
-              maxlength="6"
+              maxlength="64"
               autocomplete="off"
               autocapitalize="characters"
               class="w-full px-4 py-3 text-center font-mono tracking-[0.35em] uppercase bg-blue-50 border border-gray-400/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••"
+              placeholder="••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••"
             />
             <button type="button" id="verify-btn" class="w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
               <span id="verify-label">Verify</span>

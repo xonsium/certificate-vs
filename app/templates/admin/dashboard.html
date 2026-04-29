@@ -37,7 +37,31 @@
           placeholder="Search…"
         />
       </div>
-      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">Search</button>
+      <div class="w-32">
+        <label class="block text-sm text-gray-600 mb-1">Event</label>
+        <select
+          name="event"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">All Events</option>
+          {% for ev in events %}
+            <option value="{{ ev }}" {{ 'selected' if event_filter == ev else '' }}>{{ ev }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="w-40">
+        <label class="block text-sm text-gray-600 mb-1">Segment</label>
+        <select
+          name="segment"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">All Segments</option>
+          {% for seg in segments %}
+            <option value="{{ seg }}" {{ 'selected' if segment_filter == seg else '' }}>{{ seg }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">Filter</button>
     </form>
 
     <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -52,7 +76,7 @@
               {% endif %}
               <a
                 class="hover:text-blue-600"
-                href="{{ url_for('admin.dashboard', page=1, q=q, sort='created_at', order=noc) }}"
+                href="{{ url_for('admin.dashboard', page=1, q=q, sort='created_at', order=noc, event=event_filter, segment=segment_filter) }}"
                 >Created</a
               >
             </th>
@@ -64,7 +88,7 @@
               {% endif %}
               <a
                 class="hover:text-blue-600"
-                href="{{ url_for('admin.dashboard', page=1, q=q, sort='event', order=noe) }}"
+                href="{{ url_for('admin.dashboard', page=1, q=q, sort='event', order=noe, event=event_filter, segment=segment_filter) }}"
                 >Event</a
               >
             </th>
@@ -76,7 +100,7 @@
               {% endif %}
               <a
                 class="hover:text-blue-600"
-                href="{{ url_for('admin.dashboard', page=1, q=q, sort='verification_code', order=nov) }}"
+                href="{{ url_for('admin.dashboard', page=1, q=q, sort='verification_code', order=nov, event=event_filter, segment=segment_filter) }}"
                 >Code</a
               >
             </th>
@@ -88,7 +112,7 @@
               {% endif %}
               <a
                 class="hover:text-blue-600"
-                href="{{ url_for('admin.dashboard', page=1, q=q, sort='name', order=non) }}"
+                href="{{ url_for('admin.dashboard', page=1, q=q, sort='name', order=non, event=event_filter, segment=segment_filter) }}"
                 >Name</a
               >
             </th>
@@ -139,7 +163,7 @@
         {% if page > 1 %}
           <a
             class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
-            href="{{ url_for('admin.dashboard', page=page-1, q=q, sort=sort, order=order) }}"
+            href="{{ url_for('admin.dashboard', page=page-1, q=q, sort=sort, order=order, event=event_filter, segment=segment_filter) }}"
             >«</a
           >
         {% endif %}
@@ -147,7 +171,7 @@
         {% if page < pages %}
           <a
             class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
-            href="{{ url_for('admin.dashboard', page=page+1, q=q, sort=sort, order=order) }}"
+            href="{{ url_for('admin.dashboard', page=page+1, q=q, sort=sort, order=order, event=event_filter, segment=segment_filter) }}"
             >»</a
           >
         {% endif %}

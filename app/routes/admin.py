@@ -49,6 +49,8 @@ def dashboard():
     sort = request.args.get("sort", "created_at")
     order = request.args.get("order", "desc")
     search = request.args.get("q", "", type=str)
+    event_filter = request.args.get("event", "", type=str)
+    segment_filter = request.args.get("segment", "", type=str)
     sort_dir = -1 if order == "desc" else 1
 
     rows, total = m.certificate_list_paginated(
@@ -57,9 +59,14 @@ def dashboard():
         sort_field=sort,
         sort_dir=sort_dir,
         search=search or None,
+        event_filter=event_filter or None,
+        segment_filter=segment_filter or None,
     )
     stats = m.certificate_stats()
     pages = (total + Config.PER_PAGE - 1) // Config.PER_PAGE if total else 1
+
+    # Get unique segments for filter
+    segments = m.certificate_get_unique_segments()
 
     return render_template(
         "admin/dashboard.html",
@@ -70,8 +77,11 @@ def dashboard():
         sort=sort,
         order=order,
         q=search or "",
+        event_filter=event_filter,
+        segment_filter=segment_filter,
         stats=stats,
         events=Config.EVENTS,
+        segments=segments,
     )
 
 

@@ -20,12 +20,12 @@ class LoginForm(FlaskForm):
 class CertificateForm(FlaskForm):
     event = SelectField("Event", choices=_events(), validators=[DataRequired()])
     verification_code = StringField(
-        "Verification code (6 characters, leave blank to generate)",
-        validators=[Optional(), Length(min=0, max=6)],
+        "Verification code (64 characters, leave blank to generate)",
+        validators=[Optional(), Length(min=0, max=64)],
     )
     name = StringField("Full name", validators=[DataRequired(), Length(max=256)])
     institution = StringField("Institution", validators=[DataRequired(), Length(max=256)])
-    segment = StringField("Segment", validators=[DataRequired(), Length(max=256)])
+    segment = StringField("Segment", validators=[Optional(), Length(max=256)])
     prize_place = StringField(
         "Prize place", validators=[DataRequired(), Length(max=256)]
     )
@@ -38,8 +38,8 @@ class CertificateForm(FlaskForm):
         raw = (field.data or "").strip()
         if not raw:
             return
-        if len(raw) != 6 or not re.match(r"^[A-Za-z0-9]{6}$", raw):
-            raise ValidationError("Must be exactly 6 alphanumeric characters.")
+        if len(raw) != 64 or not re.match(r"^[A-Za-z0-9]{64}$", raw):
+            raise ValidationError("Must be exactly 64 alphanumeric characters.")
 
 
 class ChangePasswordForm(FlaskForm):

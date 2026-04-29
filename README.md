@@ -129,6 +129,23 @@ print(response.status_code)
 print(response.text)
 ```
 
+#### Participation Certificates (FTMPC only)
+
+To create a participation certificate for FTMPC, add `"cert_type": "participation"` to your request. For winner certificates, use `"cert_type": "winner"` (default).
+
+Example:
+
+```json
+{
+  "event": "FTMPC",
+  "verification_code": "",
+  "installment": "2026",
+  "cert_type": "participation"
+}
+```
+
+For participation certificates, only `event`, `installment`, and `cert_type` are required. All other fields are ignored.
+
 ## Certificate Templates
 
 Templates are split by event and can be edited independently:

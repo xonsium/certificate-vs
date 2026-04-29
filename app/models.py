@@ -23,10 +23,10 @@ class Certificate(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     event = db.Column(db.String(64), nullable=False, index=True)
-    verification_code = db.Column(db.String(6), nullable=False)
+    verification_code = db.Column(db.String(64), nullable=False)
     name = db.Column(db.String(256), nullable=False)
     institution = db.Column(db.String(256), nullable=False)
-    segment = db.Column(db.String(256), nullable=False)
+    segment = db.Column(db.String(256), nullable=True)
     prize_place = db.Column(db.String(256), nullable=False)
     installment = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), nullable=False)
@@ -71,7 +71,7 @@ def _admin_to_dict(admin: Admin) -> dict[str, Any]:
     }
 
 
-def generate_verification_code(length: int = 6) -> str:
+def generate_verification_code(length: int = 64) -> str:
     return "".join(secrets.choice(CODE_ALPHABET) for _ in range(length))
 
 
@@ -112,6 +112,12 @@ def certificate_find_by_event_code(event: str, code: str) -> dict | None:
         event=event,
         verification_code=code.upper().strip(),
     ).first()
+    return _certificate_to_dict(cert) if cert else None
+
+
+def certificate_find_first_by_event(event: str) -> dict | None:
+    """Find the first certificate record for a given event."""
+    cert = Certificate.query.filter_by(event=event).first()
     return _certificate_to_dict(cert) if cert else None
 
 
@@ -162,6 +168,8 @@ def certificate_list_paginated(
     sort_field: str,
     sort_dir: int,
     search: str | None,
+    event_filter: str | None = None,
+    segment_filter: str | None = None,
 ) -> tuple[list[dict], int]:
     query = Certificate.query
     if search and search.strip():
@@ -173,6 +181,10 @@ def certificate_list_paginated(
                 Certificate.verification_code.ilike(s),
             )
         )
+    if event_filter and event_filter.strip():
+        query = query.filter(Certificate.event == event_filter.strip())
+    if segment_filter and segment_filter.strip():
+        query = query.filter(Certificate.segment == segment_filter.strip())
     total = query.count()
     allowed_sort = {
         "created_at": Certificate.created_at,
@@ -184,6 +196,15 @@ def certificate_list_paginated(
     sort_column = sort_column.desc() if sort_dir == -1 else sort_column.asc()
     rows = query.order_by(sort_column).offset((page - 1) * per_page).limit(per_page).all()
     return [_certificate_to_dict(row) for row in rows], total
+
+
+def certificate_get_unique_segments() -> list[str]:
+    """Get all unique segment values from the database."""
+    segments = db.session.query(Certificate.segment).distinct().filter(
+        Certificate.segment.isnot(None),
+        Certificate.segment != ""
+    ).all()
+    return [s[0] for s in segments if s[0]]
 
 
 def certificate_stats() -> dict[str, Any]:

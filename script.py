@@ -1,6 +1,6 @@
 import requests
 
-token = ""
+token = "cvs_r-hfGDlXsVpPR0wbWXFBM3XANJ3k6y2HKKXn3BUQjLg"
 
 url = "http://127.0.0.1:5000/api/certificates"
 
@@ -10,13 +10,13 @@ headers = {
 }
 
 data = {
-    "event": "FTMPC",
+    "event": "INIT",
     "verification_code": "",
-    "name": "John Doe",
+    "name": "Black Doe",
     "institution": "ABC Institute",
-    "segment": "Programming",
-    "prize_place": "2nd",
-    "installment": "2026"
+    "segment": "Tech Quiz",
+    "prize_place": "1st",
+    "installment": "5.0"
 }
 
 response = requests.post(url, headers=headers, json=data)

@@ -35,7 +35,7 @@ def verify():
 
     if event not in Config.EVENTS:
         return jsonify({"ok": False, "error": "invalid_event"}), 400
-    if not re.match(r"^[A-Za-z0-9]{6}$", code):
+    if not re.match(r"^[A-Za-z0-9]{64}$", code):
         return jsonify({"ok": False, "error": "invalid_code"}), 400
 
     doc = m.certificate_find_by_event_code(event, code)
@@ -76,21 +76,43 @@ def certificates_create():
     segment = (data.get("segment") or "").strip()
     prize_place = (data.get("prize_place") or "").strip()
     installment = (data.get("installment") or "").strip()
+    cert_type = (data.get("cert_type") or "winner").strip().lower()
 
     if event not in Config.EVENTS:
         return jsonify({"ok": False, "error": "invalid_event"}), 400
-    if code and not re.match(r"^[A-Za-z0-9]{6}$", code):
+    if code and not re.match(r"^[A-Za-z0-9]{64}$", code):
         return jsonify({"ok": False, "error": "invalid_code"}), 400
-    required = {
-        "name": name,
-        "institution": institution,
-        "segment": segment,
-        "prize_place": prize_place,
-        "installment": installment,
-    }
-    missing = [k for k, v in required.items() if not v]
-    if missing:
-        return jsonify({"ok": False, "error": "missing_fields", "fields": missing}), 400
+    
+    # Validate cert_type
+    if cert_type not in ["winner", "participation"]:
+        return jsonify({"ok": False, "error": "invalid_cert_type"}), 400
+
+    # For participation certificates, only event, code, and installment are required
+    if cert_type == "participation" and event == "FTMPC":
+        if not installment:
+            return jsonify({"ok": False, "error": "missing_fields", "fields": ["installment"]}), 400
+        # Participation certs don't need the other fields
+        required = {
+            "name": name,
+            "institution": institution,
+            "prize_place": prize_place,
+            "installment": installment,
+        }
+        missing = [k for k, v in required.items() if not v]
+        if missing:
+            return jsonify({"ok": False, "error": "missing_fields", "fields": missing}), 400
+    else:
+        # For winner certificates, all fields are required
+        required = {
+            "name": name,
+            "institution": institution,
+            "segment": segment,
+            "prize_place": prize_place,
+            "installment": installment,
+        }
+        missing = [k for k, v in required.items() if not v]
+        if missing:
+            return jsonify({"ok": False, "error": "missing_fields", "fields": missing}), 400
 
     payload = {
         "event": event,
@@ -100,6 +122,7 @@ def certificates_create():
         "segment": segment,
         "prize_place": prize_place,
         "installment": installment,
+        "cert_type": cert_type,
     }
     try:
         oid = m.certificate_create_with_optional_code(payload)
@@ -142,10 +165,63 @@ def download_certificate():
     data = request.get_json(silent=True) or {}
     event = (data.get("event") or "").strip()
     code = (data.get("code") or "").strip().upper()
+    cert_type = (data.get("cert_type") or "winner").strip()
 
     if event not in Config.EVENTS:
         return jsonify({"ok": False, "error": "invalid_event"}), 400
-    if not re.match(r"^[A-Za-z0-9]{6}$", code):
+
+    # For participation certificates without code, skip verification
+    if cert_type == "participation" and not code:
+        # Generate participation certificate directly
+        try:
+            # Get installment from request or default to "1"
+            installment = (data.get("installment") or "1").strip()
+            
+            template_path = _get_participation_template_path(event, installment)
+            if not template_path:
+                return jsonify({"ok": False, "error": "invalid_event"}), 400
+
+            # For FTMPC participation, we need to look up the participant data
+            # by event (since all FTMPC participants have codes)
+            name = ""
+            institution = ""
+            segment = ""
+            prize_place = ""
+            code = ""
+
+            # If FTMPC, we need to find a participant record to get the data
+            if event == "FTMPC":
+                # Find any FTMPC participant to get template data
+                participant = m.certificate_find_first_by_event(event)
+                if participant:
+                    name = participant.get("name", "")
+                    institution = participant.get("institution", "")
+                    segment = participant.get("segment", "")
+                    prize_place = participant.get("prize_place", "")
+                    code = participant.get("verification_code", "")
+
+            html_string = render_template(
+                "certificate_pdf.html",
+                certificate_template=template_path,
+                event=event,
+                name=name,
+                institution=institution,
+                segment=segment,
+                prize_place=prize_place,
+                installment=installment,
+                code=code,
+            )
+
+            return jsonify({
+                "ok": True,
+                "html": html_string,
+                "filename": f"{event}_participation_{installment}",
+            })
+        except Exception as e:
+            return jsonify({"ok": False, "error": "html_generation_failed", "message": str(e)}), 500
+
+    # For winner certificates or FTMPC participation, require verification code
+    if not re.match(r"^[A-Za-z0-9]{64}$", code):
         return jsonify({"ok": False, "error": "invalid_code"}), 400
 
     doc = m.certificate_find_by_event_code(event, code)
@@ -198,3 +274,28 @@ def download_certificate():
         })
     except Exception as e:
         return jsonify({"ok": False, "error": "html_generation_failed", "message": str(e)}), 500
+
+
+def _get_participation_template_path(event: str, installment: str) -> str | None:
+    """Get the template path for participation certificates."""
+    participation_template_map = {
+        ("FTMPC", "1"): "certificates/ftmpc_participation_1.html",
+        ("FTMPC", "2"): "certificates/ftmpc_participation_2.html",
+        ("INIT", "1"): "certificates/init_participation_1.html",
+        ("INIT", "2"): "certificates/init_participation_2.html",
+        ("Thynk", "1"): "certificates/thynk_participation_1.html",
+        ("Thynk", "2"): "certificates/thynk_participation_2.html",
+        ("PixelCon", "1"): "certificates/pixelcon_participation_1.html",
+        ("PixelCon", "2"): "certificates/pixelcon_participation_2.html",
+    }
+    # Fallback to event-based participation template
+    participation_fallback_map = {
+        "FTMPC": "certificates/ftmpc_participation.html",
+        "INIT": "certificates/init_participation.html",
+        "Thynk": "certificates/thynk_participation.html",
+        "PixelCon": "certificates/pixelcon_participation.html",
+    }
+    template_path = participation_template_map.get((event, installment))
+    if not template_path:
+        template_path = participation_fallback_map.get(event)
+    return template_path
