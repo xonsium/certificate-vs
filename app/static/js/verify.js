@@ -180,7 +180,7 @@
   async function verify() {
     if (!selectedEvent || !selectedCertType) return;
     const code = (codeInput.value || "").trim().toUpperCase();
-    if (!/^[A-Za-z0-9]{64}$/.test(code)) {
+    if (!/^[A-Za-z0-9]{6,64}$/.test(code)) {
       verifyError.textContent = "Please enter a valid 64-character code.";
       verifyError.classList.remove("hidden");
       return;

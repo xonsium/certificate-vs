@@ -35,7 +35,7 @@ def verify():
 
     if event not in Config.EVENTS:
         return jsonify({"ok": False, "error": "invalid_event"}), 400
-    if not re.match(r"^[A-Za-z0-9]{64}$", code):
+    if not re.match(r"^[A-Za-z0-9]{6,64}$", code):
         return jsonify({"ok": False, "error": "invalid_code"}), 400
 
     doc = m.certificate_find_by_event_code(event, code)

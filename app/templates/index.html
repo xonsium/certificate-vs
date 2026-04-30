@@ -103,17 +103,18 @@
             ></span>
           </div>
           <p class="text-sm text-brand-muted">
-            Sixty-four alphanumeric characters (letters and numbers), as printed on your materials.
+            Six to sixty-four alphanumeric characters (letters and numbers), as printed on your materials.
           </p>
           <div class="flex flex-col gap-3">
             <input
               type="text"
               id="code-input"
+              minlength="6"
               maxlength="64"
               autocomplete="off"
               autocapitalize="characters"
               class="w-full px-4 py-3 text-center font-mono tracking-[0.35em] uppercase bg-blue-50 border border-gray-400/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••"
+              placeholder="Enter 6-64 character code"
             />
             <button type="button" id="verify-btn" class="w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
               <span id="verify-label">Verify</span>
