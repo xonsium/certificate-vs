@@ -1,6 +1,6 @@
 import requests
 
-token = "cvs_r-hfGDlXsVpPR0wbWXFBM3XANJ3k6y2HKKXn3BUQjLg"
+token = "cvs_iYcVsTDVud3envaHh0D-QthlCj3Lld24ed99iUKBh6Y"
 
 url = "http://127.0.0.1:5000/api/certificates"
 
@@ -10,11 +10,12 @@ headers = {
 }
 
 data = {
-    "event": "INIT",
+    "event": "FTMPC",
     "verification_code": "",
     "name": "Black Doe",
     "institution": "ABC Institute",
-    "segment": "Tech Quiz",
+    "segment": "",
+    "cert_type": "participation",
     "prize_place": "1st",
     "installment": "5.0"
 }

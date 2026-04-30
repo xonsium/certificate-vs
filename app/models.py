@@ -29,11 +29,13 @@ class Certificate(db.Model):
     segment = db.Column(db.String(256), nullable=True)
     prize_place = db.Column(db.String(256), nullable=False)
     installment = db.Column(db.String(256), nullable=False)
+    cert_type = db.Column(db.String(64), nullable=False, default="winner")
     created_at = db.Column(db.DateTime(timezone=True), nullable=False)
 
     __table_args__ = (
         db.UniqueConstraint("event", "verification_code", name="uix_event_verification_code"),
         db.Index("idx_verification_code", "verification_code"),
+        db.Index("idx_event_cert_type", "event", "cert_type"),
     )
 
 
@@ -57,6 +59,7 @@ def _certificate_to_dict(cert: Certificate) -> dict[str, Any]:
         "segment": cert.segment,
         "prize_place": cert.prize_place,
         "installment": cert.installment,
+        "cert_type": cert.cert_type,
         "created_at": cert.created_at,
     }
 
@@ -92,6 +95,7 @@ def certificate_create(data: dict[str, Any]) -> str:
         segment=data["segment"].strip(),
         prize_place=data["prize_place"].strip(),
         installment=data["installment"].strip(),
+        cert_type=data.get("cert_type", "winner").strip(),
         created_at=_now(),
     )
     db.session.add(cert)
@@ -121,6 +125,12 @@ def certificate_find_first_by_event(event: str) -> dict | None:
     return _certificate_to_dict(cert) if cert else None
 
 
+def certificate_find_first_by_event_and_type(event: str, cert_type: str) -> dict | None:
+    """Find the first certificate record for a given event and cert_type."""
+    cert = Certificate.query.filter_by(event=event, cert_type=cert_type).first()
+    return _certificate_to_dict(cert) if cert else None
+
+
 def certificate_get(oid: str) -> dict | None:
     try:
         cert_id = int(oid)
@@ -145,6 +155,7 @@ def certificate_update(oid: str, data: dict[str, Any]) -> dict | None:
     cert.segment = data["segment"].strip()
     cert.prize_place = data["prize_place"].strip()
     cert.installment = data["installment"].strip()
+    cert.cert_type = data.get("cert_type", "winner").strip()
     db.session.commit()
     return _certificate_to_dict(cert)
 

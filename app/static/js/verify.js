@@ -181,7 +181,7 @@
     if (!selectedEvent || !selectedCertType) return;
     const code = (codeInput.value || "").trim().toUpperCase();
     if (!/^[A-Za-z0-9]{6,64}$/.test(code)) {
-      verifyError.textContent = "Please enter a valid 64-character code.";
+      verifyError.textContent = "Please enter a valid 6-64 character code.";
       verifyError.classList.remove("hidden");
       return;
     }
@@ -194,13 +194,15 @@
           "Content-Type": "application/json",
           "X-CSRFToken": csrf,
         },
-        body: JSON.stringify({ event: selectedEvent, code }),
+        body: JSON.stringify({ event: selectedEvent, code, cert_type: selectedCertType }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) {
         verifyError.textContent =
           data.error === "not_found"
             ? "Invalid code or event combination."
+            : data.error === "invalid_cert_type_for_code"
+            ? `This code is for ${data.certificate?.cert_type || 'a different'} certificate. Please select the correct certificate type.`
             : "Something went wrong. Please try again.";
         verifyError.classList.remove("hidden");
         hide(step3);

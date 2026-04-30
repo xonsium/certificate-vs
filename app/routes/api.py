@@ -32,15 +32,23 @@ def verify():
     data = request.get_json(silent=True) or {}
     event = (data.get("event") or "").strip()
     code = (data.get("code") or "").strip()
+    cert_type = (data.get("cert_type") or "winner").strip().lower()
 
     if event not in Config.EVENTS:
         return jsonify({"ok": False, "error": "invalid_event"}), 400
     if not re.match(r"^[A-Za-z0-9]{6,64}$", code):
         return jsonify({"ok": False, "error": "invalid_code"}), 400
+    if cert_type not in ["winner", "participation"]:
+        return jsonify({"ok": False, "error": "invalid_cert_type"}), 400
 
     doc = m.certificate_find_by_event_code(event, code)
     if not doc:
         return jsonify({"ok": False, "error": "not_found"}), 404
+
+    # Validate that the code matches the cert_type
+    stored_cert_type = doc.get("cert_type", "winner")
+    if stored_cert_type != cert_type:
+        return jsonify({"ok": False, "error": "invalid_cert_type_for_code"}), 400
 
     return jsonify(
         {
@@ -80,7 +88,7 @@ def certificates_create():
 
     if event not in Config.EVENTS:
         return jsonify({"ok": False, "error": "invalid_event"}), 400
-    if code and not re.match(r"^[A-Za-z0-9]{64}$", code):
+    if code and not re.match(r"^[A-Za-z0-9]{6,64}$", code):
         return jsonify({"ok": False, "error": "invalid_code"}), 400
     
     # Validate cert_type
@@ -192,7 +200,7 @@ def download_certificate():
             # If FTMPC, we need to find a participant record to get the data
             if event == "FTMPC":
                 # Find any FTMPC participant to get template data
-                participant = m.certificate_find_first_by_event(event)
+                participant = m.certificate_find_first_by_event_and_type(event, "participation")
                 if participant:
                     name = participant.get("name", "")
                     institution = participant.get("institution", "")
@@ -221,15 +229,18 @@ def download_certificate():
             return jsonify({"ok": False, "error": "html_generation_failed", "message": str(e)}), 500
 
     # For winner certificates or FTMPC participation, require verification code
-    if not re.match(r"^[A-Za-z0-9]{64}$", code):
+    if not re.match(r"^[A-Za-z0-9]{6,64}$", code):
         return jsonify({"ok": False, "error": "invalid_code"}), 400
 
     doc = m.certificate_find_by_event_code(event, code)
     if not doc:
         return jsonify({"ok": False, "error": "not_found"}), 404
 
-    # Map event + installment to template file
-    template_path_map = {
+    # Use the stored cert_type from the database to determine template
+    stored_cert_type = doc.get("cert_type", "winner")
+
+    # Map event + installment to winner template file
+    winner_template_map = {
         ("FTMPC", "1"): "certificates/ftmpc_1.html",
         ("FTMPC", "2"): "certificates/ftmpc_2.html",
         ("INIT", "1"): "certificates/init_1.html",
@@ -239,13 +250,41 @@ def download_certificate():
         ("PixelCon", "1"): "certificates/pixelcon_1.html",
         ("PixelCon", "2"): "certificates/pixelcon_2.html",
     }
-    # Fallback to event-based template if installment-specific not found
-    fallback_map = {
+    # Fallback to event-based winner template if installment-specific not found
+    winner_fallback_map = {
         "FTMPC": "certificates/ftmpc.html",
         "INIT": "certificates/init.html",
         "Thynk": "certificates/thynk.html",
         "PixelCon": "certificates/pixelcon.html",
     }
+
+    # Map event + installment to participation template file
+    participation_template_map = {
+        ("FTMPC", "1"): "certificates/ftmpc_participation_1.html",
+        ("FTMPC", "2"): "certificates/ftmpc_participation_2.html",
+        ("INIT", "1"): "certificates/init_participation_1.html",
+        ("INIT", "2"): "certificates/init_participation_2.html",
+        ("Thynk", "1"): "certificates/thynk_participation_1.html",
+        ("Thynk", "2"): "certificates/thynk_participation_2.html",
+        ("PixelCon", "1"): "certificates/pixelcon_participation_1.html",
+        ("PixelCon", "2"): "certificates/pixelcon_participation_2.html",
+    }
+    # Fallback to event-based participation template
+    participation_fallback_map = {
+        "FTMPC": "certificates/ftmpc_participation.html",
+        "INIT": "certificates/init_participation.html",
+        "Thynk": "certificates/thynk_participation.html",
+        "PixelCon": "certificates/pixelcon_participation.html",
+    }
+
+    # Select the appropriate template based on cert_type
+    if stored_cert_type == "participation":
+        template_path_map = participation_template_map
+        fallback_map = participation_fallback_map
+    else:
+        template_path_map = winner_template_map
+        fallback_map = winner_fallback_map
+
     installment = doc.get("installment", "1")
     template_path = template_path_map.get((event, installment))
     if not template_path:
